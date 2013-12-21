@@ -14,6 +14,7 @@
  * language governing permissions and limitations under the License.
  */
 package org.savantbuild.plugin.groovy
+
 import org.savantbuild.dep.DefaultDependencyService
 import org.savantbuild.dep.DependencyService
 import org.savantbuild.dep.domain.ArtifactID
@@ -30,13 +31,13 @@ import java.nio.file.Paths
  * Layout class that defines the directories used by the Groovy plugin.
  */
 class GroovyLayout {
-  def buildDir = Paths.get("build")
-  def buildMainClassDir = buildDir.resolve("classes/main")
-  def buildTestClassDir = buildDir.resolve("classes/test")
-  def mainSrcDir = Paths.get("src/main/groovy")
-  def mainResourceDir = Paths.get("src/main/resources")
-  def testSrcDir = Paths.get("src/test/groovy")
-  def testResourceDir = Paths.get("src/test/resources")
+  def buildDirectory = Paths.get("build")
+  def mainSourceDirectory = Paths.get("src/main/groovy")
+  def mainResourceDirectory = Paths.get("src/main/resources")
+  def mainBuildDirectory = buildDirectory.resolve("classes/main")
+  def testSourceDirectory = Paths.get("src/test/groovy")
+  def testResourceDirectory = Paths.get("src/test/resources")
+  def testBuildDirectory = buildDirectory.resolve("classes/test")
 }
 
 /**
@@ -49,7 +50,7 @@ class GroovySettings {
   def mainDependencyResolveConfiguration = new DependencyService.ResolveConfiguration()
       .with("compile", new DependencyService.ResolveConfiguration.TypeResolveConfiguration(true, false))
   def testDependencyResolveConfiguration = new DependencyService.ResolveConfiguration()
-      .with("compile", new DependencyService.ResolveConfiguration.TypeResolveConfiguration(true, false))
+      .with("test-compile", new DependencyService.ResolveConfiguration.TypeResolveConfiguration(true, false))
 }
 
 /**
@@ -75,6 +76,7 @@ class GroovyPlugin extends AbstractPlugin {
   def groovycPath
   def javaHome
   def javacPath
+  def jarPath
 
   def GroovyPlugin(project, output) {
     super(project, output)
@@ -83,25 +85,94 @@ class GroovyPlugin extends AbstractPlugin {
     javaProperties = loadConfiguration(new ArtifactID("org.savantbuild.plugin", "java", "java", "jar"), JAVA_ERROR_MESSAGE)
   }
 
+  /**
+   * Cleans the build directory by completely deleting it.
+   */
   def clean() {
-    Path buildDir = project.directory.resolve(layout.buildDir)
+    Path buildDir = project.directory.resolve(layout.buildDirectory)
     output.info "Cleaning [${buildDir}]"
     FileTools.prune(buildDir)
   }
 
+  /**
+   * Compiles the main Groovy files (src/main/groovy by default).
+   */
   def compileMain() {
     initialize()
+    compile(layout.mainSourceDirectory, layout.mainBuildDirectory, settings.mainDependencyResolveConfiguration)
+    copyResources(layout.mainResourceDirectory, layout.mainBuildDirectory)
+  }
 
-    List<String> filesToCompile = FileTools.modifiedFiles(project.directory, layout.mainSrcDir, layout.buildMainClassDir, ".groovy")
+  /**
+   * Compiles the test Groovy files (src/test/groovy by default).
+   */
+  def compileTest() {
+    initialize()
+    compile(layout.testSourceDirectory, layout.testBuildDirectory, settings.testDependencyResolveConfiguration, layout.mainBuildDirectory)
+    copyResources(layout.testResourceDirectory, layout.testBuildDirectory)
+  }
+
+  /**
+   * Compiles an arbitrary source directory to an arbitrary build directory.
+   *
+   * @param sourceDirectory The source directory that contains the groovy source files.
+   * @param buildDirectory The build directory to compile the groovy files to.
+   * @param resolveConfiguration The ResolveConfiguration for building the classpath from the project's depenedencies.
+   */
+  def compile(sourceDirectory, buildDirectory, resolveConfiguration, Path... additionalClasspath) {
+    List<String> filesToCompile = FileTools.modifiedFiles(project.directory, sourceDirectory, buildDirectory, ".groovy")
     if (filesToCompile.isEmpty()) {
       output.info("Skipping compile. No files need compiling")
       return
     }
 
-    output.info "Compiling [${filesToCompile.size()}] Groovy classes from [${layout.mainSrcDir}] to [${layout.buildMainClassDir}]"
+    output.info "Compiling [${filesToCompile.size()}] Groovy classes from [${sourceDirectory}] to [${buildDirectory}]"
 
-    String command = "${groovycPath} ${settings.compilerArguments} ${classpath(settings.mainDependencyResolveConfiguration)} -sourcepath ${layout.mainSrcDir} -d ${layout.buildMainClassDir} ${filesToCompile.join(" ")}"
-    Files.createDirectories(project.directory.resolve(layout.buildMainClassDir))
+    String command = "${groovycPath} ${settings.compilerArguments} ${classpath(resolveConfiguration, additionalClasspath)} --sourcepath ${sourceDirectory} -d ${buildDirectory} ${filesToCompile.join(" ")}"
+    Files.createDirectories(project.directory.resolve(buildDirectory))
+    Process process = command.execute(["JAVA_HOME=${javaHome}"], project.directory.toFile())
+    process.consumeProcessOutput((Appendable) System.out, System.err)
+    process.waitFor()
+
+    int exitCode = process.exitValue()
+    if (exitCode != 0) {
+      fail("Compilation failed")
+    }
+  }
+
+  /**
+   * Copies the resource files from the source directory to the build directory. This copies all of the files
+   * recursively to the build directory.
+   *
+   * @param sourceDirectory The source directory that contains the files to copy.
+   * @param buildDirectory The build directory to copy the files to.
+   */
+  def copyResources(sourceDirectory, buildDirectory) {
+    FileTools.copyRecursive(Files.list(project.directory.resolve(sourceDirectory)), project.directory.resolve(buildDirectory))
+  }
+
+  def jar() {
+    initialize()
+
+    Path jarDir = layout.buildDirectory.resolve("jars")
+    Path jarFile = jarDir.resolve(project.toArtifact().getArtifactFile())
+    jar(jarFile, layout.mainBuildDirectory)
+    Path sourceJarFile = jarDir.resolve(project.toArtifact().getArtifactSourceFile())
+    jar(sourceJarFile, layout.mainSourceDirectory)
+
+    Path testJarFile = jarDir.resolve(project.toArtifact().getArtifactTestFile())
+    jar(testJarFile, layout.testBuildDirectory)
+    Path testSourceJarFile = jarDir.resolve(project.toArtifact().getArtifactTestSourceFile())
+    jar(testSourceJarFile, layout.testSourceDirectory)
+  }
+
+  def jar(jarFile, directory) {
+    output.info "Creating JAR [${jarFile}] from build directory [${directory}]"
+
+    Files.createDirectories(project.directory.resolve(jarFile).getParent())
+
+    String command = "${jarPath} cf ${jarFile} ${directory}"
+    println command
     Process process = command.execute(["JAVA_HOME=${javaHome}"], project.directory.toFile())
     process.consumeProcessOutput((Appendable) System.out, System.err)
     process.waitFor()
@@ -112,27 +183,7 @@ class GroovyPlugin extends AbstractPlugin {
     }
   }
 
-  def compileTest() {
-    initialize()
-
-    List<String> filesToCompile = FileTools.modifiedFiles(project.directory, layout.mainSrcDir, layout.buildMainClassDir, ".groovy")
-    if (filesToCompile.isEmpty()) {
-      return
-    }
-
-    output.info "Compiling [${filesToCompile.size()}] Groovy classes from [${layout.testSrcDir}] to [${layout.buildTestClassDir}]"
-
-    String command = "${groovycPath} ${settings.compilerArguments} ${classpath(settings.testDependencyResolveConfiguration)} -sourcepath ${layout.testSrcDir} -d ${layout.buildTestClassDir}"
-    Files.createDirectories(project.directory.resolve(layout.buildTestClassDir))
-    Process process = command.execute(["JAVA_HOME=${javaHome}"], project.directory.toFile())
-    process.consumeProcessOutput((Appendable) System.out, System.err)
-    process.waitFor()
-    if (!process.exitValue()) {
-      fail("Build failed")
-    }
-  }
-
-  private String classpath(DependencyService.ResolveConfiguration resolveConfiguration) {
+  private String classpath(DependencyService.ResolveConfiguration resolveConfiguration, Path... paths) {
     if (!project.dependencies) {
       return ""
     }
@@ -144,7 +195,16 @@ class GroovyPlugin extends AbstractPlugin {
     }
 
     ResolvedArtifactGraph resolvedArtifactGraph = service.resolve(project.artifactGraph, project.workflow, resolveConfiguration)
-    return "-classpath ${resolvedArtifactGraph.toClasspath()}"
+    if (resolvedArtifactGraph.size() == 0) {
+      return ""
+    }
+
+    String classpath = "-classpath ${resolvedArtifactGraph.toClasspath()}"
+    if (paths.length > 0) {
+      classpath += File.pathSeparator + paths.join(File.pathSeparator)
+    }
+
+    return classpath
   }
 
   private void initialize() {
@@ -182,6 +242,14 @@ class GroovyPlugin extends AbstractPlugin {
     }
     if (!Files.isExecutable(javacPath)) {
       fail("The javac compiler [${javacPath.toAbsolutePath()}] is not executable.")
+    }
+
+    jarPath = Paths.get(javaHome, "bin/jar")
+    if (!Files.isRegularFile(jarPath)) {
+      fail("The jar utility [${jarPath.toAbsolutePath()}] does not exist.")
+    }
+    if (!Files.isExecutable(jarPath)) {
+      fail("The jar utility [${jarPath.toAbsolutePath()}] is not executable.")
     }
   }
 }
