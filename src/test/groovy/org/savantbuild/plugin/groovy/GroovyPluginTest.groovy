@@ -15,11 +15,7 @@
  */
 package org.savantbuild.plugin.groovy
 
-import org.savantbuild.dep.domain.Dependencies
-import org.savantbuild.dep.domain.Dependency
-import org.savantbuild.dep.domain.DependencyGroup
-import org.savantbuild.dep.domain.License
-import org.savantbuild.dep.domain.Version
+import org.savantbuild.dep.domain.*
 import org.savantbuild.dep.workflow.FetchWorkflow
 import org.savantbuild.dep.workflow.PublishWorkflow
 import org.savantbuild.dep.workflow.Workflow
@@ -37,8 +33,7 @@ import java.nio.file.Path
 import java.nio.file.Paths
 import java.util.jar.JarFile
 
-import static org.testng.Assert.assertFalse
-import static org.testng.Assert.assertTrue
+import static org.testng.Assert.*
 
 /**
  * Tests the groovy plugin.
@@ -60,7 +55,9 @@ class GroovyPluginTest {
   public void all() throws Exception {
     FileTools.prune(Paths.get("build/cache"))
 
-    Output output = new SystemOutOutput(System.out, true)
+    Output output = new SystemOutOutput(true)
+    output.enableDebug()
+
     Project project = new Project(projectDir.resolve("test-project"))
     project.group = "org.savantbuild.test"
     project.name = "test-project"
@@ -98,15 +95,15 @@ class GroovyPluginTest {
     assertTrue(Files.isRegularFile(projectDir.resolve("test-project/build/jars/test-project-1.0.0.jar")))
     assertJarContains(projectDir.resolve("test-project/build/jars/test-project-1.0.0.jar"), "MyClass.class", "main.txt")
     assertTrue(Files.isRegularFile(projectDir.resolve("test-project/build/jars/test-project-1.0.0-src.jar")))
-    assertJarContains(projectDir.resolve("test-project/build/jars/test-project-1.0.0.jar"), "MyClass.java")
+    assertJarContains(projectDir.resolve("test-project/build/jars/test-project-1.0.0-src.jar"), "MyClass.groovy")
     assertTrue(Files.isRegularFile(projectDir.resolve("test-project/build/jars/test-project-test-1.0.0.jar")))
-    assertJarContains(projectDir.resolve("test-project/build/jars/test-project-1.0.0.jar"), "MyClassTest.class", "test.txt")
+    assertJarContains(projectDir.resolve("test-project/build/jars/test-project-test-1.0.0.jar"), "MyClassTest.class", "test.txt")
     assertTrue(Files.isRegularFile(projectDir.resolve("test-project/build/jars/test-project-test-1.0.0-src.jar")))
-    assertJarContains(projectDir.resolve("test-project/build/jars/test-project-1.0.0.jar"), "MyClassTest.java")
+    assertJarContains(projectDir.resolve("test-project/build/jars/test-project-test-1.0.0-src.jar"), "MyClassTest.groovy")
   }
 
-  private void assertJarContains(Path jarFile, String... entries) {
+  private static void assertJarContains(Path jarFile, String... entries) {
     JarFile jf = new JarFile(jarFile.toFile())
-
+    entries.each({ entry -> assertNotNull(jf.getEntry(entry), "Jar [${jarFile}] is missing entry [${entry}]") })
   }
 }
