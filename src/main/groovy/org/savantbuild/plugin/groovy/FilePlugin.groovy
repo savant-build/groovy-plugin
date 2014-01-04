@@ -14,14 +14,12 @@
  * language governing permissions and limitations under the License.
  */
 package org.savantbuild.plugin.groovy
-
 import org.savantbuild.domain.Project
 import org.savantbuild.io.Copier
 import org.savantbuild.output.Output
 import org.savantbuild.util.jar.JarBuilder
 
 import java.nio.file.Path
-
 /**
  * File plugin.
  *
@@ -34,17 +32,19 @@ class FilePlugin extends Plugin {
   }
 
   def copy(Closure block) {
-    Copier copier = new Copier(output, project.directory)
+    Copier copier = new Copier(project.directory)
     block.setDelegate(copier)
     block()
-    copier.copy()
+    int count = copier.copy()
+    output.info("Copied [%d] files to [%s]", count, copier.to)
   }
 
   def jar(Path file, Closure block) {
     file = file.isAbsolute() ? file : project.directory.resolve(file)
-    JarBuilder builder = new JarBuilder(file)
+    JarBuilder builder = new JarBuilder(file, project.directory)
     block.setDelegate(builder)
     block()
-    builder.build()
+    int count = builder.build()
+    output.info("Jarred [%d] files to [%s]", count, file)
   }
 }

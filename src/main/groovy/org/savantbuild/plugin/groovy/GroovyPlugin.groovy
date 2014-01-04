@@ -102,7 +102,6 @@ class GroovyPlugin extends Plugin {
     output.info "Compiling [${filesToCompile.size()}] Groovy classes from [${sourceDirectory}] to [${buildDirectory}]"
 
     String command = "${groovycPath} ${settings.compilerArguments} ${classpath(resolveConfiguration, additionalClasspath)} --sourcepath ${sourceDirectory} -d ${buildDirectory} ${filesToCompile.join(" ")}"
-    println command
     Files.createDirectories(project.directory.resolve(buildDirectory))
     Process process = command.execute(["JAVA_HOME=${javaHome}"], project.directory.toFile())
     process.consumeProcessOutput((Appendable) System.out, System.err)
@@ -132,18 +131,18 @@ class GroovyPlugin extends Plugin {
     initialize()
 
     jar(project.toArtifact().getArtifactFile(), layout.mainBuildDirectory)
-    jar(project.toArtifact().getArtifactSourceFile(), layout.mainSourceDirectory)
+    jar(project.toArtifact().getArtifactSourceFile(), layout.mainSourceDirectory, layout.mainResourceDirectory)
     jar(project.toArtifact().getArtifactTestFile(), layout.testBuildDirectory)
-    jar(project.toArtifact().getArtifactTestSourceFile(), layout.testSourceDirectory)
+    jar(project.toArtifact().getArtifactTestSourceFile(), layout.testSourceDirectory, layout.testResourceDirectory)
   }
 
-  void jar(String jarFile, Path directory) {
+  void jar(String jarFile, Path... directories) {
     Path jarFilePath = layout.jarOutputDirectory.resolve(jarFile)
 
-    output.info "Creating JAR [${jarFile}] from build directory [${directory}]"
+    output.info "Creating JAR [${jarFile}]"
 
     filePlugin.jar(jarFilePath) {
-      fileSet(directory)
+      directories.each {dir -> fileSet(dir)}
     }
   }
 

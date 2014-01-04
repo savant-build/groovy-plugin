@@ -58,7 +58,7 @@ class GroovyPluginTest {
     Output output = new SystemOutOutput(true)
     output.enableDebug()
 
-    Project project = new Project(projectDir.resolve("test-project"))
+    Project project = new Project(projectDir.resolve("test-project"), output)
     project.group = "org.savantbuild.test"
     project.name = "test-project"
     project.version = new Version("1.0")
@@ -95,11 +95,11 @@ class GroovyPluginTest {
     assertTrue(Files.isRegularFile(projectDir.resolve("test-project/build/jars/test-project-1.0.0.jar")))
     assertJarContains(projectDir.resolve("test-project/build/jars/test-project-1.0.0.jar"), "MyClass.class", "main.txt")
     assertTrue(Files.isRegularFile(projectDir.resolve("test-project/build/jars/test-project-1.0.0-src.jar")))
-    assertJarContains(projectDir.resolve("test-project/build/jars/test-project-1.0.0-src.jar"), "MyClass.groovy")
+    assertJarContains(projectDir.resolve("test-project/build/jars/test-project-1.0.0-src.jar"), "MyClass.groovy", "main.txt")
     assertTrue(Files.isRegularFile(projectDir.resolve("test-project/build/jars/test-project-test-1.0.0.jar")))
     assertJarContains(projectDir.resolve("test-project/build/jars/test-project-test-1.0.0.jar"), "MyClassTest.class", "test.txt")
     assertTrue(Files.isRegularFile(projectDir.resolve("test-project/build/jars/test-project-test-1.0.0-src.jar")))
-    assertJarContains(projectDir.resolve("test-project/build/jars/test-project-test-1.0.0-src.jar"), "MyClassTest.groovy")
+    assertJarContains(projectDir.resolve("test-project/build/jars/test-project-test-1.0.0-src.jar"), "MyClassTest.groovy", "test.txt")
   }
 
   private static void assertJarContains(Path jarFile, String... entries) {
