@@ -28,7 +28,7 @@ import org.savantbuild.output.Output
  *
  * @author Brian Pontarelli
  */
-class DependencyPlugin extends Plugin {
+class DependencyPlugin extends BaseGroovyPlugin {
   DependencyService dependencyService = new DefaultDependencyService(output)
 
   DependencyPlugin(Project project, Output output) {

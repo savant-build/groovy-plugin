@@ -25,7 +25,7 @@ import java.nio.file.Path
  *
  * @author Brian Pontarelli
  */
-class FilePlugin extends Plugin {
+class FilePlugin extends BaseGroovyPlugin {
 
   FilePlugin(Project project, Output output) {
     super(project, output)

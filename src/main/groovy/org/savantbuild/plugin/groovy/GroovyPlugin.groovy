@@ -29,7 +29,7 @@ import java.nio.file.Paths
 /**
  * The Groovy plugin. The public methods on this class define the features of the plugin.
  */
-class GroovyPlugin extends Plugin {
+class GroovyPlugin extends BaseGroovyPlugin {
   public static final String ERROR_MESSAGE = "You must create the file [%s] " +
       "that contains the system configuration for the Groovy plugin. This file should include the location of the GDK " +
       "(groovy and groovyc) by version. These properties look like this:\n\n" +
