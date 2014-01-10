@@ -28,6 +28,8 @@
     <orderEntry type="module" module-name="savant-core" />
     <orderEntry type="module" module-name="savant-dependency-management" />
     <orderEntry type="module" module-name="savant-utils" />
+    <orderEntry type="module" module-name="dependency-plugin" />
+    <orderEntry type="module" module-name="file-plugin" />
   </component>
 </module>
 

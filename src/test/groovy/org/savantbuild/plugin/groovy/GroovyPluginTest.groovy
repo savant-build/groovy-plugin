@@ -53,7 +53,7 @@ class GroovyPluginTest {
 
   @Test
   public void all() throws Exception {
-    FileTools.prune(Paths.get("build/cache"))
+    FileTools.prune(projectDir.resolve("build/cache"))
 
     Output output = new SystemOutOutput(true)
     output.enableDebug()
@@ -105,5 +105,6 @@ class GroovyPluginTest {
   private static void assertJarContains(Path jarFile, String... entries) {
     JarFile jf = new JarFile(jarFile.toFile())
     entries.each({ entry -> assertNotNull(jf.getEntry(entry), "Jar [${jarFile}] is missing entry [${entry}]") })
+    jf.close()
   }
 }

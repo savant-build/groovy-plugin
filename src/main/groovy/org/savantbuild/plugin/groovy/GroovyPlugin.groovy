@@ -21,6 +21,8 @@ import org.savantbuild.domain.Project
 import org.savantbuild.io.FileTools
 import org.savantbuild.lang.Classpath
 import org.savantbuild.output.Output
+import org.savantbuild.plugin.dep.DependencyPlugin
+import org.savantbuild.plugin.file.FilePlugin
 
 import java.nio.file.Files
 import java.nio.file.Path
@@ -142,13 +144,14 @@ class GroovyPlugin extends BaseGroovyPlugin {
     output.info "Creating JAR [${jarFile}]"
 
     filePlugin.jar(jarFilePath) {
-      directories.each {dir -> fileSet(dir)}
+      directories.each { dir -> fileSet(dir) }
     }
   }
 
   private String classpath(ResolveConfiguration resolveConfiguration, Path... paths) {
-    Classpath classpath = dependencyPlugin.classpath(resolveConfiguration)
-    classpath.addAll(paths)
+    Classpath classpath = dependencyPlugin.classpath(resolveConfiguration) {
+      paths(paths)
+    }
     return classpath.toString("-classpath ")
   }
 
