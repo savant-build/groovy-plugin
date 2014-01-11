@@ -47,7 +47,7 @@ class GroovyPluginTest {
   public void beforeSuite() {
     projectDir = Paths.get("")
     if (!Files.isRegularFile(projectDir.resolve("LICENSE"))) {
-      projectDir = Paths.get("groovy-plugin")
+      projectDir = Paths.get("../groovy-plugin")
     }
   }
 
