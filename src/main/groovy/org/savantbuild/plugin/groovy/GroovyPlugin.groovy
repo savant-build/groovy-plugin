@@ -148,9 +148,9 @@ class GroovyPlugin extends BaseGroovyPlugin {
     }
   }
 
-  private String classpath(ResolveConfiguration resolveConfiguration, Path... paths) {
+  private String classpath(ResolveConfiguration resolveConfiguration, Path... additionalPaths) {
     Classpath classpath = dependencyPlugin.classpath(resolveConfiguration) {
-      paths(paths)
+      paths(additionalPaths)
     }
     return classpath.toString("-classpath ")
   }
