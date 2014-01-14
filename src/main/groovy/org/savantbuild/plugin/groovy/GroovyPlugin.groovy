@@ -32,12 +32,12 @@ import java.nio.file.Paths
  * The Groovy plugin. The public methods on this class define the features of the plugin.
  */
 class GroovyPlugin extends BaseGroovyPlugin {
-  public static final String ERROR_MESSAGE = "You must create the file [%s] " +
+  public static final String ERROR_MESSAGE = "You must create the file [~/.savant/plugins/org.savantbuild.plugin.groovy.properties] " +
       "that contains the system configuration for the Groovy plugin. This file should include the location of the GDK " +
       "(groovy and groovyc) by version. These properties look like this:\n\n" +
       "  2.1=/Library/Groovy/Versions/2.1/Home\n" +
       "  2.2=/Library/Groovy/Versions/2.2/Home\n"
-  public static final String JAVA_ERROR_MESSAGE = "You must create the file [%s] " +
+  public static final String JAVA_ERROR_MESSAGE = "You must create the file [~/.savant/plugins/org.savantbuild.plugin.java.properties] " +
       "that contains the system configuration for the Java system. This file should include the location of the JDK " +
       "(java and javac) by version. These properties look like this:\n\n" +
       "  1.6=/Library/Java/JavaVirtualMachines/1.6.0_65-b14-462.jdk/Contents/Home\n" +
