@@ -27,6 +27,9 @@ class GroovySettings {
   String compilerArguments = ""
   ResolveConfiguration mainDependencyResolveConfiguration = new ResolveConfiguration()
       .with("compile", new TypeResolveConfiguration(true, false))
+      .with("provided", new TypeResolveConfiguration(true, false))
   ResolveConfiguration testDependencyResolveConfiguration = new ResolveConfiguration()
+      .with("compile", new TypeResolveConfiguration(true, false))
       .with("test-compile", new TypeResolveConfiguration(true, false))
+      .with("provided", new TypeResolveConfiguration(true, false))
 }

@@ -95,9 +95,15 @@ class GroovyPlugin extends BaseGroovyPlugin {
    * @param resolveConfiguration The ResolveConfiguration for building the classpath from the project's depenedencies.
    */
   void compile(Path sourceDirectory, Path buildDirectory, ResolveConfiguration resolveConfiguration, Path... additionalClasspath) {
-    output.debug "Looking for modified files to compile in [${project.directory.resolve(sourceDirectory)}] compared with [${project.directory.resolve(buildDirectory)}]"
+    def resolvedSourceDir = project.directory.resolve(sourceDirectory)
+    def resolvedBuildDir = project.directory.resolve(buildDirectory)
 
-    List<String> filesToCompile = FileTools.modifiedFiles(project.directory, sourceDirectory, buildDirectory, ".groovy")
+    output.debug "Looking for modified files to compile in [${resolvedSourceDir}] compared with [${resolvedBuildDir}]"
+
+    def filter = FileTools.extensionFilter(".groovy")
+    def mapper = FileTools.extensionMapper(".groovy", ".class")
+    List<Path> filesToCompile = FileTools.modifiedFiles(resolvedSourceDir, resolvedBuildDir, filter, mapper)
+                                         .collect({ path -> sourceDirectory.resolve(path) })
     if (filesToCompile.isEmpty()) {
       output.info("Skipping compile for source directory [${sourceDirectory}]. No files need compiling")
       return
@@ -106,7 +112,7 @@ class GroovyPlugin extends BaseGroovyPlugin {
     output.info "Compiling [${filesToCompile.size()}] Groovy classes from [${sourceDirectory}] to [${buildDirectory}]"
 
     String command = "${groovycPath} ${settings.compilerArguments} ${classpath(resolveConfiguration, additionalClasspath)} --sourcepath ${sourceDirectory} -d ${buildDirectory} ${filesToCompile.join(" ")}"
-    Files.createDirectories(project.directory.resolve(buildDirectory))
+    Files.createDirectories(resolvedBuildDir)
     Process process = command.execute(["JAVA_HOME=${javaHome}"], project.directory.toFile())
     process.consumeProcessOutput((Appendable) System.out, System.err)
     process.waitFor()
@@ -146,7 +152,11 @@ class GroovyPlugin extends BaseGroovyPlugin {
     output.info "Creating JAR [${jarFile}]"
 
     filePlugin.jar(jarFilePath) {
-      directories.each { dir -> fileSet(dir) }
+      directories.each { dir ->
+        if (Files.isDirectory(dir)) {
+          fileSet(dir)
+        }
+      }
     }
   }
 
