@@ -95,9 +95,11 @@ class GroovyPlugin extends BaseGroovyPlugin {
    * @param resolveConfiguration The ResolveConfiguration for building the classpath from the project's depenedencies.
    */
   void compile(Path sourceDirectory, Path buildDirectory, ResolveConfiguration resolveConfiguration, Path... additionalClasspath) {
+    output.debug "Looking for modified files to compile in [${project.directory.resolve(sourceDirectory)}] compared with [${project.directory.resolve(buildDirectory)}]"
+
     List<String> filesToCompile = FileTools.modifiedFiles(project.directory, sourceDirectory, buildDirectory, ".groovy")
     if (filesToCompile.isEmpty()) {
-      output.info("Skipping compile. No files need compiling")
+      output.info("Skipping compile for source directory [${sourceDirectory}]. No files need compiling")
       return
     }
 
