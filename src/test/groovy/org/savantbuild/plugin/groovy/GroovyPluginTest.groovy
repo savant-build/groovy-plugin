@@ -14,7 +14,6 @@
  * language governing permissions and limitations under the License.
  */
 package org.savantbuild.plugin.groovy
-
 import org.savantbuild.dep.domain.*
 import org.savantbuild.dep.workflow.FetchWorkflow
 import org.savantbuild.dep.workflow.PublishWorkflow
@@ -34,7 +33,6 @@ import java.nio.file.Paths
 import java.util.jar.JarFile
 
 import static org.testng.Assert.*
-
 /**
  * Tests the groovy plugin.
  *
@@ -65,15 +63,11 @@ class GroovyPluginTest {
     project.license = License.Apachev2
 
     Path repositoryPath = Paths.get(System.getProperty("user.home"), "dev/inversoft/repositories/savant")
+    def cache = new CacheProcess(output, projectDir.resolve('build/cache').toString())
     project.dependencies = new Dependencies(new DependencyGroup("test-compile", false, new Dependency("org.testng:testng:6.8:jar", false)))
     project.workflow = new Workflow(
-        new FetchWorkflow(output,
-            new CacheProcess(output, projectDir.resolve("build/cache").toString()),
-            new URLProcess(output, repositoryPath.toUri().toString(), null, null)
-        ),
-        new PublishWorkflow(
-            new CacheProcess(output, projectDir.resolve("build/cache").toString())
-        )
+        new FetchWorkflow(output, cache, new URLProcess(output, repositoryPath.toUri().toString(), null, null)),
+        new PublishWorkflow(cache)
     )
 
     GroovyPlugin plugin = new GroovyPlugin(project, output)

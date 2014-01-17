@@ -174,11 +174,11 @@ class JavaPlugin {
 project(name: "test-project", group: "org.savantbuild.test", version: "0.1", license: "Commercial") {
   workflow {
     fetch {
-      cache(dir: "${SYS['user.home']}/.savant/cache")
+      cache()
       url(url: "http://repository.savantbuild.org")
     }
     publish {
-      cache(dir: "${SYS['user.home']}/.savant/cache")
+      cache()
     }
   }
 }

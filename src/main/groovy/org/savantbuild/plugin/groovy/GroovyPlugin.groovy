@@ -27,6 +27,8 @@ import org.savantbuild.plugin.file.FilePlugin
 import java.nio.file.Files
 import java.nio.file.Path
 import java.nio.file.Paths
+import java.util.function.Function
+import java.util.function.Predicate
 
 /**
  * The Groovy plugin. The public methods on this class define the features of the plugin.
@@ -95,13 +97,13 @@ class GroovyPlugin extends BaseGroovyPlugin {
    * @param resolveConfiguration The ResolveConfiguration for building the classpath from the project's depenedencies.
    */
   void compile(Path sourceDirectory, Path buildDirectory, ResolveConfiguration resolveConfiguration, Path... additionalClasspath) {
-    def resolvedSourceDir = project.directory.resolve(sourceDirectory)
-    def resolvedBuildDir = project.directory.resolve(buildDirectory)
+    Path resolvedSourceDir = project.directory.resolve(sourceDirectory)
+    Path resolvedBuildDir = project.directory.resolve(buildDirectory)
 
     output.debug "Looking for modified files to compile in [${resolvedSourceDir}] compared with [${resolvedBuildDir}]"
 
-    def filter = FileTools.extensionFilter(".groovy")
-    def mapper = FileTools.extensionMapper(".groovy", ".class")
+    Predicate<Path> filter = FileTools.extensionFilter(".groovy")
+    Function<Path, Path> mapper = FileTools.extensionMapper(".groovy", ".class")
     List<Path> filesToCompile = FileTools.modifiedFiles(resolvedSourceDir, resolvedBuildDir, filter, mapper)
                                          .collect({ path -> sourceDirectory.resolve(path) })
     if (filesToCompile.isEmpty()) {
@@ -111,7 +113,7 @@ class GroovyPlugin extends BaseGroovyPlugin {
 
     output.info "Compiling [${filesToCompile.size()}] Groovy classes from [${sourceDirectory}] to [${buildDirectory}]"
 
-    String command = "${groovycPath} ${settings.compilerArguments} ${classpath(resolveConfiguration, additionalClasspath)} --sourcepath ${sourceDirectory} -d ${buildDirectory} ${filesToCompile.join(" ")}"
+    String command = "${groovycPath} ${settings.indy ? '--indy' : ''} ${settings.compilerArguments} ${classpath(resolveConfiguration, additionalClasspath)} --sourcepath ${sourceDirectory} -d ${buildDirectory} ${filesToCompile.join(" ")}"
     Files.createDirectories(resolvedBuildDir)
     Process process = command.execute(["JAVA_HOME=${javaHome}"], project.directory.toFile())
     process.consumeProcessOutput((Appendable) System.out, System.err)
@@ -153,7 +155,8 @@ class GroovyPlugin extends BaseGroovyPlugin {
 
     filePlugin.jar(jarFilePath) {
       directories.each { dir ->
-        if (Files.isDirectory(dir)) {
+        output.debug("Inspecting directory [${dir}] for JAR file")
+        if (Files.isDirectory(project.directory.resolve(dir))) {
           fileSet(dir)
         }
       }

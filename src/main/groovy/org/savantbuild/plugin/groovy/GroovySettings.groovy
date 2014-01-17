@@ -25,6 +25,7 @@ class GroovySettings {
   String groovyVersion
   String javaVersion
   String compilerArguments = ""
+  boolean indy = false
   ResolveConfiguration mainDependencyResolveConfiguration = new ResolveConfiguration()
       .with("compile", new TypeResolveConfiguration(true, false))
       .with("provided", new TypeResolveConfiguration(true, false))
