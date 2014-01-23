@@ -14,6 +14,7 @@
  * language governing permissions and limitations under the License.
  */
 package org.savantbuild.plugin.groovy
+
 import org.savantbuild.dep.domain.*
 import org.savantbuild.dep.workflow.FetchWorkflow
 import org.savantbuild.dep.workflow.PublishWorkflow
@@ -33,6 +34,7 @@ import java.nio.file.Paths
 import java.util.jar.JarFile
 
 import static org.testng.Assert.*
+
 /**
  * Tests the groovy plugin.
  *
