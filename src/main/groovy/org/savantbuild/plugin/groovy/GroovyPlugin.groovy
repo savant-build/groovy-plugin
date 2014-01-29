@@ -14,6 +14,7 @@
  * language governing permissions and limitations under the License.
  */
 package org.savantbuild.plugin.groovy
+
 import org.savantbuild.dep.domain.ArtifactID
 import org.savantbuild.domain.Project
 import org.savantbuild.io.FileTools
@@ -26,6 +27,7 @@ import java.nio.file.Path
 import java.nio.file.Paths
 import java.util.function.Function
 import java.util.function.Predicate
+
 /**
  * The Groovy plugin. The public methods on this class define the features of the plugin.
  */
@@ -72,7 +74,7 @@ class GroovyPlugin extends BaseGroovyPlugin {
    */
   void compileMain() {
     initialize()
-    compile(layout.mainSourceDirectory, layout.mainBuildDirectory, settings.mainDependencies)
+    compile(layout.mainSourceDirectory, layout.mainBuildDirectory, settings.mainDependencies, layout.mainBuildDirectory)
     copyResources(layout.mainResourceDirectory, layout.mainBuildDirectory)
   }
 
@@ -81,7 +83,7 @@ class GroovyPlugin extends BaseGroovyPlugin {
    */
   void compileTest() {
     initialize()
-    compile(layout.testSourceDirectory, layout.testBuildDirectory, settings.testDependencies, layout.mainBuildDirectory)
+    compile(layout.testSourceDirectory, layout.testBuildDirectory, settings.testDependencies, layout.mainBuildDirectory, layout.testBuildDirectory)
     copyResources(layout.testResourceDirectory, layout.testBuildDirectory)
   }
 
