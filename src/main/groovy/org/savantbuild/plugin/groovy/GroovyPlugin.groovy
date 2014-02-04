@@ -97,8 +97,9 @@ class GroovyPlugin extends BaseGroovyPlugin {
   void compile(Path sourceDirectory, Path buildDirectory, List<Map<String, Object>> dependencies, Path... additionalClasspath) {
     Path resolvedSourceDir = project.directory.resolve(sourceDirectory)
     Path resolvedBuildDir = project.directory.resolve(buildDirectory)
+    Files.createDirectories(resolvedBuildDir)
 
-    output.debug "Looking for modified files to compile in [${resolvedSourceDir}] compared with [${resolvedBuildDir}]"
+    output.debug("Looking for modified files to compile in [${resolvedSourceDir}] compared with [${resolvedBuildDir}]")
 
     Predicate<Path> filter = FileTools.extensionFilter(".groovy")
     Function<Path, Path> mapper = FileTools.extensionMapper(".groovy", ".class")
@@ -112,7 +113,8 @@ class GroovyPlugin extends BaseGroovyPlugin {
     output.info "Compiling [${filesToCompile.size()}] Groovy classes from [${sourceDirectory}] to [${buildDirectory}]"
 
     String command = "${groovycPath} ${settings.indy ? '--indy' : ''} ${settings.compilerArguments} ${classpath(dependencies, additionalClasspath)} --sourcepath ${sourceDirectory} -d ${buildDirectory} ${filesToCompile.join(" ")}"
-    Files.createDirectories(resolvedBuildDir)
+    output.debug("Executing [${command}]")
+
     Process process = command.execute(["JAVA_HOME=${javaHome}"], project.directory.toFile())
     process.consumeProcessOutput((Appendable) System.out, System.err)
     process.waitFor()
@@ -148,7 +150,7 @@ class GroovyPlugin extends BaseGroovyPlugin {
   void jar(String jarFile, Path... directories) {
     Path jarFilePath = layout.jarOutputDirectory.resolve(jarFile)
 
-    output.info "Creating JAR [${jarFile}]"
+    output.info("Creating JAR [${jarFilePath}]")
 
     filePlugin.jar(file: jarFilePath) {
       directories.each { dir ->
