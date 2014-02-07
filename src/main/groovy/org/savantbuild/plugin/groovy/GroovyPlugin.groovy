@@ -70,6 +70,14 @@ class GroovyPlugin extends BaseGroovyPlugin {
   }
 
   /**
+   * Compiles the main and test Java files (src/main/groovy and src/test/groovy).
+   */
+  void compile() {
+    compileMain()
+    compileTest()
+  }
+
+  /**
    * Compiles the main Groovy files (src/main/groovy by default).
    */
   void compileMain() {

@@ -1,4 +1,4 @@
-savant-utils
+Groovy Plugin
 ============================
 
-Savant Utility classes (output, colorization, etc).
+This plugin provides the ability for Groovy projects to use Savant. You can learn about the features of the Groovy Plugin on the (wiki)[https://github.com/inversoft/savant-groovy-plugin/wiki/Home].
