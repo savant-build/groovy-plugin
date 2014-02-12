@@ -62,6 +62,12 @@ class GroovyPlugin extends BaseGroovyPlugin {
 
   /**
    * Cleans the build directory by completely deleting it.
+   * <p/>
+   * Here is an example of calling this method:
+   * <p/>
+   * <pre>
+   *   groovy.clean()
+   * </pre>
    */
   void clean() {
     Path buildDir = project.directory.resolve(layout.buildDirectory)
@@ -71,6 +77,12 @@ class GroovyPlugin extends BaseGroovyPlugin {
 
   /**
    * Compiles the main and test Java files (src/main/groovy and src/test/groovy).
+   * <p/>
+   * Here is an example of calling this method:
+   * <p/>
+   * <pre>
+   *   groovy.compile()
+   * </pre>
    */
   void compile() {
     compileMain()
@@ -79,6 +91,12 @@ class GroovyPlugin extends BaseGroovyPlugin {
 
   /**
    * Compiles the main Groovy files (src/main/groovy by default).
+   * <p/>
+   * Here is an example of calling this method:
+   * <p/>
+   * <pre>
+   *   groovy.compileMain()
+   * </pre>
    */
   void compileMain() {
     initialize()
@@ -88,6 +106,12 @@ class GroovyPlugin extends BaseGroovyPlugin {
 
   /**
    * Compiles the test Groovy files (src/test/groovy by default).
+   * <p/>
+   * Here is an example of calling this method:
+   * <p/>
+   * <pre>
+   *   groovy.compileTest()
+   * </pre>
    */
   void compileTest() {
     initialize()
@@ -97,6 +121,12 @@ class GroovyPlugin extends BaseGroovyPlugin {
 
   /**
    * Compiles an arbitrary source directory to an arbitrary build directory.
+   * <p/>
+   * Here is an example of calling this method:
+   * <p/>
+   * <pre>
+   *   groovy.compile(Paths.get("src/foo"), Paths.get("build/bar"), [[group: "compile", transitive: false, fetchSource: false]], Paths.get("additionalClasspathDirectory"))
+   * </pre>
    *
    * @param sourceDirectory The source directory that contains the groovy source files.
    * @param buildDirectory The build directory to compile the groovy files to.
@@ -136,6 +166,12 @@ class GroovyPlugin extends BaseGroovyPlugin {
   /**
    * Copies the resource files from the source directory to the build directory. This copies all of the files
    * recursively to the build directory.
+   * <p/>
+   * Here is an example of calling this method:
+   * <p/>
+   * <pre>
+   *   groovy.copyResources(Paths.get("src/some-resources"), Paths.get("build/output-dir"))
+   * </pre>
    *
    * @param sourceDirectory The source directory that contains the files to copy.
    * @param buildDirectory The build directory to copy the files to.
@@ -150,21 +186,41 @@ class GroovyPlugin extends BaseGroovyPlugin {
     }
   }
 
+  /**
+   * Creates the project's Jar files. This creates four Jar files. The main Jar, main source Jar, test Jar and test
+   * source Jar.
+   * <p/>
+   * Here is an example of calling this method:
+   * <p/>
+   * <pre>
+   *   groovy.jar()
+   * </pre>
+   */
   void jar() {
     initialize()
 
-    jar(project.toArtifact().getArtifactFile(), layout.mainBuildDirectory)
-    jar(project.toArtifact().getArtifactSourceFile(), layout.mainSourceDirectory, layout.mainResourceDirectory)
-    jar(project.toArtifact().getArtifactTestFile(), layout.testBuildDirectory)
-    jar(project.toArtifact().getArtifactTestSourceFile(), layout.testSourceDirectory, layout.testResourceDirectory)
+    jar(layout.jarOutputDirectory.resolve(project.toArtifact().getArtifactFile()), layout.mainBuildDirectory)
+    jar(layout.jarOutputDirectory.resolve(project.toArtifact().getArtifactSourceFile()), layout.mainSourceDirectory, layout.mainResourceDirectory)
+    jar(layout.jarOutputDirectory.resolve(project.toArtifact().getArtifactTestFile()), layout.testBuildDirectory)
+    jar(layout.jarOutputDirectory.resolve(project.toArtifact().getArtifactTestSourceFile()), layout.testSourceDirectory, layout.testResourceDirectory)
   }
 
-  void jar(String jarFile, Path... directories) {
-    Path jarFilePath = layout.jarOutputDirectory.resolve(jarFile)
+  /**
+   * Creates a single Jar file by adding all of the files in the given directories.
+   * <p/>
+   * Here is an example of calling this method:
+   * <p/>
+   * <pre>
+   *   groovy.jar(Paths.get("foo/bar.jar"), Paths.get("src/main/groovy"), Paths.get("some-other-dir"))
+   * </pre>
+   *
+   * @param jarFile The Jar file to create.
+   * @param directories The directories to include in the Jar file.
+   */
+  void jar(Path jarFile, Path... directories) {
+    output.info("Creating JAR [${jarFile}]")
 
-    output.info("Creating JAR [${jarFilePath}]")
-
-    filePlugin.jar(file: jarFilePath) {
+    filePlugin.jar(file: jarFile) {
       directories.each { dir ->
         optionalFileSet(dir: dir)
       }
