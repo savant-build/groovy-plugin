@@ -34,9 +34,14 @@ class GroovySettings {
   String javaVersion
 
   /**
-   * Any additional compiler arguments. This are included when groovyc is invoked. Defaults to {@code ""}.
+   * Additional compiler arguments. This are included when groovyc is invoked. Defaults to {@code ""}.
    */
   String compilerArguments = ""
+
+  /**
+   * Additional groovydoc arguments. This are included when groovydoc is invoked. Defaults to {@code ""}.
+   */
+  String docArguments = ""
 
   /**
    * Determines if the compiler should generate code that uses invokedynamic. Defaults to {@code false}.

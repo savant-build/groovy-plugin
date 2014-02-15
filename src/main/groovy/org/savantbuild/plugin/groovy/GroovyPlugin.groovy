@@ -17,6 +17,7 @@ package org.savantbuild.plugin.groovy
 
 import org.savantbuild.dep.domain.ArtifactID
 import org.savantbuild.domain.Project
+import org.savantbuild.io.FileSet
 import org.savantbuild.io.FileTools
 import org.savantbuild.output.Output
 import org.savantbuild.plugin.dep.DependencyPlugin
@@ -27,17 +28,20 @@ import java.nio.file.Path
 import java.nio.file.Paths
 import java.util.function.Function
 import java.util.function.Predicate
+import java.util.stream.Collectors
 
 /**
  * The Groovy plugin. The public methods on this class define the features of the plugin.
  */
 class GroovyPlugin extends BaseGroovyPlugin {
-  public static final String ERROR_MESSAGE = "You must create the file [~/.savant/plugins/org.savantbuild.plugin.groovy.properties] " +
+  public static
+  final String ERROR_MESSAGE = "You must create the file [~/.savant/plugins/org.savantbuild.plugin.groovy.properties] " +
       "that contains the system configuration for the Groovy plugin. This file should include the location of the GDK " +
       "(groovy and groovyc) by version. These properties look like this:\n\n" +
       "  2.1=/Library/Groovy/Versions/2.1/Home\n" +
       "  2.2=/Library/Groovy/Versions/2.2/Home\n"
-  public static final String JAVA_ERROR_MESSAGE = "You must create the file [~/.savant/plugins/org.savantbuild.plugin.java.properties] " +
+  public static
+  final String JAVA_ERROR_MESSAGE = "You must create the file [~/.savant/plugins/org.savantbuild.plugin.java.properties] " +
       "that contains the system configuration for the Java system. This file should include the location of the JDK " +
       "(java and javac) by version. These properties look like this:\n\n" +
       "  1.6=/Library/Java/JavaVirtualMachines/1.6.0_65-b14-462.jdk/Contents/Home\n" +
@@ -48,6 +52,7 @@ class GroovyPlugin extends BaseGroovyPlugin {
   Properties properties
   Properties javaProperties
   Path groovycPath
+  Path groovyDocPath
   String javaHome
   FilePlugin filePlugin
   DependencyPlugin dependencyPlugin
@@ -187,6 +192,39 @@ class GroovyPlugin extends BaseGroovyPlugin {
   }
 
   /**
+   * Creates the project's Groovydoc. This executes the groovydoc command and outputs the docs to the {@code layout.docDirectory}
+   * <p/>
+   * Here is an example of calling this method:
+   * <p/>
+   * <pre>
+   *   groovy.document()
+   * </pre>
+   */
+  void document() {
+    initialize()
+
+    output.info "Generating GroovyDoc to [${layout.docDirectory}]"
+
+    FileSet fileSet = new FileSet(project.directory.resolve(layout.mainSourceDirectory))
+    Set<String> packages = fileSet.toFileInfos()
+                                  .stream()
+                                  .map({ info -> info.relative.getParent().toString().replace("/", ".") })
+                                  .collect(Collectors.toSet())
+
+    String command = "${groovyDocPath} ${classpath(settings.mainDependencies)} ${settings.docArguments} -sourcepath ${layout.mainSourceDirectory} -d ${layout.docDirectory} ${packages.join(" ")}"
+    output.debug("Executing [${command}]")
+
+    Process process = command.execute(["JAVA_HOME=${javaHome}"], project.directory.toFile())
+    process.consumeProcessOutput((Appendable) System.out, System.err)
+    process.waitFor()
+
+    int exitCode = process.exitValue()
+    if (exitCode != 0) {
+      fail("Groovydoc failed")
+    }
+  }
+
+  /**
    * Creates the project's Jar files. This creates four Jar files. The main Jar, main source Jar, test Jar and test
    * source Jar.
    * <p/>
@@ -251,6 +289,14 @@ class GroovyPlugin extends BaseGroovyPlugin {
     }
     if (!Files.isExecutable(groovycPath)) {
       fail("The groovyc compiler [${groovycPath.toAbsolutePath()}] is not executable.")
+    }
+
+    groovyDocPath = Paths.get(groovyHome, "bin/groovydoc")
+    if (!Files.isRegularFile(groovyDocPath)) {
+      fail("The groovydoc executable [${groovyDocPath.toAbsolutePath()}] does not exist.")
+    }
+    if (!Files.isExecutable(groovyDocPath)) {
+      fail("The groovydoc executable [${groovyDocPath.toAbsolutePath()}] is not executable.")
     }
 
     if (!settings.javaVersion) {
