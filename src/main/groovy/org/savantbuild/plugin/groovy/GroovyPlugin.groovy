@@ -67,9 +67,9 @@ class GroovyPlugin extends BaseGroovyPlugin {
 
   /**
    * Cleans the build directory by completely deleting it.
-   * <p/>
+   * <p>
    * Here is an example of calling this method:
-   * <p/>
+   * <p>
    * <pre>
    *   groovy.clean()
    * </pre>
@@ -82,9 +82,9 @@ class GroovyPlugin extends BaseGroovyPlugin {
 
   /**
    * Compiles the main and test Java files (src/main/groovy and src/test/groovy).
-   * <p/>
+   * <p>
    * Here is an example of calling this method:
-   * <p/>
+   * <p>
    * <pre>
    *   groovy.compile()
    * </pre>
@@ -96,9 +96,9 @@ class GroovyPlugin extends BaseGroovyPlugin {
 
   /**
    * Compiles the main Groovy files (src/main/groovy by default).
-   * <p/>
+   * <p>
    * Here is an example of calling this method:
-   * <p/>
+   * <p>
    * <pre>
    *   groovy.compileMain()
    * </pre>
@@ -111,9 +111,9 @@ class GroovyPlugin extends BaseGroovyPlugin {
 
   /**
    * Compiles the test Groovy files (src/test/groovy by default).
-   * <p/>
+   * <p>
    * Here is an example of calling this method:
-   * <p/>
+   * <p>
    * <pre>
    *   groovy.compileTest()
    * </pre>
@@ -126,9 +126,9 @@ class GroovyPlugin extends BaseGroovyPlugin {
 
   /**
    * Compiles an arbitrary source directory to an arbitrary build directory.
-   * <p/>
+   * <p>
    * Here is an example of calling this method:
-   * <p/>
+   * <p>
    * <pre>
    *   groovy.compile(Paths.get("src/foo"), Paths.get("build/bar"), [[group: "compile", transitive: false, fetchSource: false]], Paths.get("additionalClasspathDirectory"))
    * </pre>
@@ -171,9 +171,9 @@ class GroovyPlugin extends BaseGroovyPlugin {
   /**
    * Copies the resource files from the source directory to the build directory. This copies all of the files
    * recursively to the build directory.
-   * <p/>
+   * <p>
    * Here is an example of calling this method:
-   * <p/>
+   * <p>
    * <pre>
    *   groovy.copyResources(Paths.get("src/some-resources"), Paths.get("build/output-dir"))
    * </pre>
@@ -193,9 +193,9 @@ class GroovyPlugin extends BaseGroovyPlugin {
 
   /**
    * Creates the project's Groovydoc. This executes the groovydoc command and outputs the docs to the {@code layout.docDirectory}
-   * <p/>
+   * <p>
    * Here is an example of calling this method:
-   * <p/>
+   * <p>
    * <pre>
    *   groovy.document()
    * </pre>
@@ -227,9 +227,9 @@ class GroovyPlugin extends BaseGroovyPlugin {
   /**
    * Creates the project's Jar files. This creates four Jar files. The main Jar, main source Jar, test Jar and test
    * source Jar.
-   * <p/>
+   * <p>
    * Here is an example of calling this method:
-   * <p/>
+   * <p>
    * <pre>
    *   groovy.jar()
    * </pre>
@@ -245,9 +245,9 @@ class GroovyPlugin extends BaseGroovyPlugin {
 
   /**
    * Creates a single Jar file by adding all of the files in the given directories.
-   * <p/>
+   * <p>
    * Here is an example of calling this method:
-   * <p/>
+   * <p>
    * <pre>
    *   groovy.jar(Paths.get("foo/bar.jar"), Paths.get("src/main/groovy"), Paths.get("some-other-dir"))
    * </pre>

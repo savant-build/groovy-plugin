@@ -51,7 +51,7 @@ class GroovySettings {
   /**
    * The list of dependencies to include on the classpath when groovyc is called to compile the main Groovy source
    * files. This defaults to:
-   * <p/>
+   * <p>
    * <pre>
    *   [
    *     [group: "compile", transitive: false, fetchSource: false],
@@ -67,7 +67,7 @@ class GroovySettings {
   /**
    * The list of dependencies to include on the classpath when groovyc is called to compile the test Groovy source
    * files. This defaults to:
-   * <p/>
+   * <p>
    * <pre>
    *   [
    *     [group: "compile", transitive: false, fetchSource: false],
