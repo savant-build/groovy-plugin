@@ -81,4 +81,6 @@ class GroovySettings {
       [group: "test-compile", transitive: false, fetchSource: false],
       [group: "provided", transitive: false, fetchSource: false]
   ]
+
+  Map<String, String> jarManifest = [:]
 }

@@ -22,6 +22,7 @@ import org.savantbuild.io.FileTools
 import org.savantbuild.output.Output
 import org.savantbuild.plugin.dep.DependencyPlugin
 import org.savantbuild.plugin.file.FilePlugin
+import org.savantbuild.runtime.RuntimeConfiguration
 
 import java.nio.file.Files
 import java.nio.file.Path
@@ -57,10 +58,10 @@ class GroovyPlugin extends BaseGroovyPlugin {
   FilePlugin filePlugin
   DependencyPlugin dependencyPlugin
 
-  GroovyPlugin(Project project, Output output) {
-    super(project, output)
-    filePlugin = new FilePlugin(project, output)
-    dependencyPlugin = new DependencyPlugin(project, output)
+  GroovyPlugin(Project project, RuntimeConfiguration runtimeConfiguration, Output output) {
+    super(project, runtimeConfiguration, output)
+    filePlugin = new FilePlugin(project, runtimeConfiguration, output)
+    dependencyPlugin = new DependencyPlugin(project, runtimeConfiguration, output)
     properties = loadConfiguration(new ArtifactID("org.savantbuild.plugin", "groovy", "groovy", "jar"), ERROR_MESSAGE)
     javaProperties = loadConfiguration(new ArtifactID("org.savantbuild.plugin", "java", "java", "jar"), JAVA_ERROR_MESSAGE)
   }
@@ -262,6 +263,7 @@ class GroovyPlugin extends BaseGroovyPlugin {
       directories.each { dir ->
         optionalFileSet(dir: dir)
       }
+      manifest(map: settings.jarManifest)
     }
   }
 

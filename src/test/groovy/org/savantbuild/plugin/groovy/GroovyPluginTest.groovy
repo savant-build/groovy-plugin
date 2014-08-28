@@ -25,6 +25,7 @@ import org.savantbuild.domain.Project
 import org.savantbuild.io.FileTools
 import org.savantbuild.output.Output
 import org.savantbuild.output.SystemOutOutput
+import org.savantbuild.runtime.RuntimeConfiguration
 import org.testng.annotations.BeforeSuite
 import org.testng.annotations.Test
 
@@ -72,7 +73,7 @@ class GroovyPluginTest {
         new PublishWorkflow(cache)
     )
 
-    GroovyPlugin plugin = new GroovyPlugin(project, output)
+    GroovyPlugin plugin = new GroovyPlugin(project, new RuntimeConfiguration(), output)
     plugin.settings.groovyVersion = "2.1"
     plugin.settings.javaVersion = "1.6"
 
