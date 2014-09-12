@@ -67,7 +67,7 @@ class GroovyPluginTest {
 
     Path repositoryPath = Paths.get(System.getProperty("user.home"), "dev/inversoft/repositories/savant")
     def cache = new CacheProcess(output, projectDir.resolve('build/cache').toString())
-    project.dependencies = new Dependencies(new DependencyGroup("test-compile", false, new Artifact("org.testng:testng:6.8:jar")))
+    project.dependencies = new Dependencies(new DependencyGroup("test-compile", false, new Artifact("org.testng:testng:6.8:jar", false)))
     project.workflow = new Workflow(
         new FetchWorkflow(output, cache, new URLProcess(output, repositoryPath.toUri().toString(), null, null)),
         new PublishWorkflow(cache)
