@@ -63,7 +63,7 @@ class GroovyPluginTest {
     project.group = "org.savantbuild.test"
     project.name = "test-project"
     project.version = new Version("1.0")
-    project.license = License.Apachev2
+    project.licenses.put(License.ApacheV2_0, null)
 
     Path repositoryPath = Paths.get(System.getProperty("user.home"), "dev/inversoft/repositories/savant")
     def cache = new CacheProcess(output, projectDir.resolve('build/cache').toString())
