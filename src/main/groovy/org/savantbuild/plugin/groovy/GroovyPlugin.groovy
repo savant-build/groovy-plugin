@@ -52,6 +52,7 @@ class GroovyPlugin extends BaseGroovyPlugin {
   GroovySettings settings = new GroovySettings()
   Properties properties
   Properties javaProperties
+  String groovyHome
   Path groovycPath
   Path groovyDocPath
   String javaHome
@@ -159,7 +160,7 @@ class GroovyPlugin extends BaseGroovyPlugin {
     String command = "${groovycPath} ${settings.indy ? '--indy' : ''} ${settings.compilerArguments} ${classpath(dependencies, additionalClasspath)} --sourcepath ${sourceDirectory} -d ${buildDirectory} ${filesToCompile.join(" ")}"
     output.debug("Executing [${command}]")
 
-    Process process = command.execute(["JAVA_HOME=${javaHome}"], project.directory.toFile())
+    Process process = command.execute(["JAVA_HOME=${javaHome}", "GROOVY_HOME=${groovyHome}"], project.directory.toFile())
     process.consumeProcessOutput((Appendable) System.out, System.err)
     process.waitFor()
 
@@ -215,7 +216,7 @@ class GroovyPlugin extends BaseGroovyPlugin {
     String command = "${groovyDocPath} ${classpath(settings.mainDependencies)} ${settings.docArguments} -sourcepath ${layout.mainSourceDirectory} -d ${layout.docDirectory} ${packages.join(" ")}"
     output.debug("Executing [${command}]")
 
-    Process process = command.execute(["JAVA_HOME=${javaHome}"], project.directory.toFile())
+    Process process = command.execute(["JAVA_HOME=${javaHome}", "GROOVY_HOME=${groovyHome}"], project.directory.toFile())
     process.consumeProcessOutput((Appendable) System.out, System.err)
     process.waitFor()
 
@@ -280,7 +281,7 @@ class GroovyPlugin extends BaseGroovyPlugin {
           "  groovy.settings.groovyVersion=\"2.1\"")
     }
 
-    String groovyHome = properties.getProperty(settings.groovyVersion)
+    groovyHome = properties.getProperty(settings.groovyVersion)
     if (!groovyHome) {
       fail("No GDK is configured for version [${settings.groovyVersion}].\n\n" + ERROR_MESSAGE)
     }

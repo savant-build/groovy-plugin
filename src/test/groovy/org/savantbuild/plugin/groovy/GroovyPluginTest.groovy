@@ -65,16 +65,16 @@ class GroovyPluginTest {
     project.version = new Version("1.0")
     project.licenses.put(License.ApacheV2_0, null)
 
-    Path repositoryPath = Paths.get(System.getProperty("user.home"), "dev/inversoft/repositories/savant")
-    def cache = new CacheProcess(output, projectDir.resolve('build/cache').toString())
+//    Path repositoryPath = Paths.get(System.getProperty("user.home"), "dev/inversoft/repositories/savant")
+    def cache = new CacheProcess(output, null)
     project.dependencies = new Dependencies(new DependencyGroup("test-compile", false, new Artifact("org.testng:testng:6.8.7:jar", false)))
     project.workflow = new Workflow(
-        new FetchWorkflow(output, cache, new URLProcess(output, repositoryPath.toUri().toString(), null, null)),
+        new FetchWorkflow(output, cache),
         new PublishWorkflow(cache)
     )
 
     GroovyPlugin plugin = new GroovyPlugin(project, new RuntimeConfiguration(), output)
-    plugin.settings.groovyVersion = "2.1"
+    plugin.settings.groovyVersion = "2.3"
     plugin.settings.javaVersion = "1.6"
 
     plugin.clean()
