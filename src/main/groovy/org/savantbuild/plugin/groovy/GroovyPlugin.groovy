@@ -78,7 +78,7 @@ class GroovyPlugin extends BaseGroovyPlugin {
    */
   void clean() {
     Path buildDir = project.directory.resolve(layout.buildDirectory)
-    output.info "Cleaning [${buildDir}]"
+    output.infoln "Cleaning [${buildDir}]"
     FileTools.prune(buildDir)
   }
 
@@ -144,21 +144,21 @@ class GroovyPlugin extends BaseGroovyPlugin {
     Path resolvedBuildDir = project.directory.resolve(buildDirectory)
     Files.createDirectories(resolvedBuildDir)
 
-    output.debug("Looking for modified files to compile in [${resolvedSourceDir}] compared with [${resolvedBuildDir}]")
+    output.debugln("Looking for modified files to compile in [${resolvedSourceDir}] compared with [${resolvedBuildDir}]")
 
     Predicate<Path> filter = FileTools.extensionFilter(".groovy")
     Function<Path, Path> mapper = FileTools.extensionMapper(".groovy", ".class")
     List<Path> filesToCompile = FileTools.modifiedFiles(resolvedSourceDir, resolvedBuildDir, filter, mapper)
                                          .collect({ path -> sourceDirectory.resolve(path) })
     if (filesToCompile.isEmpty()) {
-      output.info("Skipping compile for source directory [${sourceDirectory}]. No files need compiling")
+      output.infoln("Skipping compile for source directory [${sourceDirectory}]. No files need compiling")
       return
     }
 
-    output.info "Compiling [${filesToCompile.size()}] Groovy classes from [${sourceDirectory}] to [${buildDirectory}]"
+    output.infoln "Compiling [${filesToCompile.size()}] Groovy classes from [${sourceDirectory}] to [${buildDirectory}]"
 
     String command = "${groovycPath} ${settings.indy ? '--indy' : ''} ${settings.compilerArguments} ${classpath(dependencies, additionalClasspath)} --sourcepath ${sourceDirectory} -d ${buildDirectory} ${filesToCompile.join(" ")}"
-    output.debug("Executing [${command}]")
+    output.debugln("Executing [${command}]")
 
     Process process = command.execute(["JAVA_HOME=${javaHome}", "GROOVY_HOME=${groovyHome}"], project.directory.toFile())
     process.consumeProcessOutput((Appendable) System.out, System.err)
@@ -205,7 +205,7 @@ class GroovyPlugin extends BaseGroovyPlugin {
   void document() {
     initialize()
 
-    output.info "Generating GroovyDoc to [${layout.docDirectory}]"
+    output.infoln "Generating GroovyDoc to [${layout.docDirectory}]"
 
     FileSet fileSet = new FileSet(project.directory.resolve(layout.mainSourceDirectory))
     Set<String> packages = fileSet.toFileInfos()
@@ -214,7 +214,7 @@ class GroovyPlugin extends BaseGroovyPlugin {
                                   .collect(Collectors.toSet())
 
     String command = "${groovyDocPath} ${classpath(settings.mainDependencies)} ${settings.docArguments} -sourcepath ${layout.mainSourceDirectory} -d ${layout.docDirectory} ${packages.join(" ")}"
-    output.debug("Executing [${command}]")
+    output.debugln("Executing [${command}]")
 
     Process process = command.execute(["JAVA_HOME=${javaHome}", "GROOVY_HOME=${groovyHome}"], project.directory.toFile())
     process.consumeProcessOutput((Appendable) System.out, System.err)
@@ -258,7 +258,7 @@ class GroovyPlugin extends BaseGroovyPlugin {
    * @param directories The directories to include in the Jar file.
    */
   void jar(Path jarFile, Path... directories) {
-    output.info("Creating JAR [${jarFile}]")
+    output.infoln("Creating JAR [${jarFile}]")
 
     filePlugin.jar(file: jarFile) {
       directories.each { dir ->
