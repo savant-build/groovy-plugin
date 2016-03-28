@@ -15,12 +15,20 @@
  */
 package org.savantbuild.plugin.groovy
 
-import org.savantbuild.dep.domain.*
+import java.nio.file.Files
+import java.nio.file.Path
+import java.nio.file.Paths
+import java.util.jar.JarFile
+
+import org.savantbuild.dep.domain.Artifact
+import org.savantbuild.dep.domain.Dependencies
+import org.savantbuild.dep.domain.DependencyGroup
+import org.savantbuild.dep.domain.License
+import org.savantbuild.dep.domain.Version
 import org.savantbuild.dep.workflow.FetchWorkflow
 import org.savantbuild.dep.workflow.PublishWorkflow
 import org.savantbuild.dep.workflow.Workflow
 import org.savantbuild.dep.workflow.process.CacheProcess
-import org.savantbuild.dep.workflow.process.URLProcess
 import org.savantbuild.domain.Project
 import org.savantbuild.io.FileTools
 import org.savantbuild.output.Output
@@ -29,12 +37,9 @@ import org.savantbuild.runtime.RuntimeConfiguration
 import org.testng.annotations.BeforeSuite
 import org.testng.annotations.Test
 
-import java.nio.file.Files
-import java.nio.file.Path
-import java.nio.file.Paths
-import java.util.jar.JarFile
-
-import static org.testng.Assert.*
+import static org.testng.Assert.assertFalse
+import static org.testng.Assert.assertNotNull
+import static org.testng.Assert.assertTrue
 
 /**
  * Tests the groovy plugin.
@@ -74,7 +79,7 @@ class GroovyPluginTest {
     )
 
     GroovyPlugin plugin = new GroovyPlugin(project, new RuntimeConfiguration(), output)
-    plugin.settings.groovyVersion = "2.3"
+    plugin.settings.groovyVersion = "2.4"
     plugin.settings.javaVersion = "1.6"
 
     plugin.clean()
