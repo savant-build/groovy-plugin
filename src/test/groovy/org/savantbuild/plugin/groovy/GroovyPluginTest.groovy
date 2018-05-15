@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014, Inversoft Inc., All Rights Reserved
+ * Copyright (c) 2014-2018, Inversoft Inc., All Rights Reserved
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -80,7 +80,7 @@ class GroovyPluginTest {
 
     GroovyPlugin plugin = new GroovyPlugin(project, new RuntimeConfiguration(), output)
     plugin.settings.groovyVersion = "2.4"
-    plugin.settings.javaVersion = "1.6"
+    plugin.settings.javaVersion = "1.8"
 
     plugin.clean()
     assertFalse(Files.isDirectory(projectDir.resolve("test-project/build")))
