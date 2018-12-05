@@ -65,7 +65,7 @@ idea.settings.moduleMap = [
     "org.savantbuild:savant-io:1.0.3"                              : "savant-io",
     "org.savantbuild:savant-utils:${savantVersion}"                : "savant-utils",
     "org.savantbuild.plugin:dependency:${savantVersion}"           : "dependency-plugin",
-    "org.savantbuild.plugin:file:${savantVersion}"                 : "file-plugin"
+    "org.savantbuild.plugin:file:1.0.2"                            : "file-plugin"
 ]
 
 target(name: "clean", description: "Cleans the project") {
