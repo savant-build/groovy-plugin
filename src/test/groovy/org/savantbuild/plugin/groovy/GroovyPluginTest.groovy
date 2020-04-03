@@ -50,7 +50,7 @@ class GroovyPluginTest {
   public static Path projectDir
 
   @BeforeSuite
-  public void beforeSuite() {
+  void beforeSuite() {
     projectDir = Paths.get("")
     if (!Files.isRegularFile(projectDir.resolve("LICENSE"))) {
       projectDir = Paths.get("../groovy-plugin")
@@ -58,7 +58,7 @@ class GroovyPluginTest {
   }
 
   @Test
-  public void all() throws Exception {
+  void all() throws Exception {
     FileTools.prune(projectDir.resolve("build/cache"))
 
     Output output = new SystemOutOutput(true)
@@ -70,7 +70,6 @@ class GroovyPluginTest {
     project.version = new Version("1.0")
     project.licenses.put(License.ApacheV2_0, null)
 
-//    Path repositoryPath = Paths.get(System.getProperty("user.home"), "dev/inversoft/repositories/savant")
     def cache = new CacheProcess(output, null)
     project.dependencies = new Dependencies(new DependencyGroup("test-compile", false, new Artifact("org.testng:testng:6.8.7:jar", false)))
     project.workflow = new Workflow(
