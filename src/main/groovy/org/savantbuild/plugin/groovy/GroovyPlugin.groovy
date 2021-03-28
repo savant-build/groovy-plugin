@@ -160,7 +160,7 @@ class GroovyPlugin extends BaseGroovyPlugin {
     String command = "${groovycPath} ${settings.indy ? '--indy' : ''} ${settings.compilerArguments} ${classpath(dependencies, additionalClasspath)} --sourcepath ${sourceDirectory} -d ${buildDirectory} ${filesToCompile.join(" ")}"
     output.debugln("Executing [${command}]")
 
-    Process process = command.execute(["JAVA_HOME=${javaHome}", "GROOVY_HOME=${groovyHome}"], project.directory.toFile())
+    Process process = command.execute(["JAVA_HOME=${javaHome}", "GROOVY_HOME=${groovyHome}", "JAVA_OPTS=${settings.jvmArguments}"], project.directory.toFile())
     process.consumeProcessOutput((Appendable) System.out, System.err)
     process.waitFor()
 
@@ -216,7 +216,7 @@ class GroovyPlugin extends BaseGroovyPlugin {
     String command = "${groovyDocPath} ${classpath(settings.mainDependencies)} ${settings.docArguments} -sourcepath ${layout.mainSourceDirectory} -d ${layout.docDirectory} ${packages.join(" ")}"
     output.debugln("Executing [${command}]")
 
-    Process process = command.execute(["JAVA_HOME=${javaHome}", "GROOVY_HOME=${groovyHome}"], project.directory.toFile())
+    Process process = command.execute(["JAVA_HOME=${javaHome}", "GROOVY_HOME=${groovyHome}", "JAVA_OPTS=${settings.jvmArguments}"], project.directory.toFile())
     process.consumeProcessOutput((Appendable) System.out, System.err)
     process.waitFor()
 

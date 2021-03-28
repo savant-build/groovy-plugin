@@ -34,6 +34,12 @@ class GroovySettings {
   String javaVersion
 
   /**
+   * A list of JVM arguments that are used when invoking groovy or groovyc commands. These are passed to the environment
+   * as the env variable JAVA_OPTS.
+   */
+  String jvmArguments = ""
+
+  /**
    * Additional compiler arguments. This are included when groovyc is invoked. Defaults to {@code ""}.
    */
   String compilerArguments = ""
