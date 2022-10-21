@@ -24,12 +24,12 @@ import org.savantbuild.dep.domain.Artifact
 import org.savantbuild.dep.domain.Dependencies
 import org.savantbuild.dep.domain.DependencyGroup
 import org.savantbuild.dep.domain.License
-import org.savantbuild.dep.domain.Version
 import org.savantbuild.dep.workflow.FetchWorkflow
 import org.savantbuild.dep.workflow.PublishWorkflow
 import org.savantbuild.dep.workflow.Workflow
 import org.savantbuild.dep.workflow.process.CacheProcess
 import org.savantbuild.domain.Project
+import org.savantbuild.domain.Version
 import org.savantbuild.io.FileTools
 import org.savantbuild.output.Output
 import org.savantbuild.output.SystemOutOutput
@@ -68,7 +68,7 @@ class GroovyPluginTest {
     project.group = "org.savantbuild.test"
     project.name = "test-project"
     project.version = new Version("1.0")
-    project.licenses.put(License.ApacheV2_0, null)
+    project.licenses.add(License.parse("ApacheV2_0", null))
 
     def cache = new CacheProcess(output, null)
     project.dependencies = new Dependencies(new DependencyGroup("test-compile", false, new Artifact("org.testng:testng:6.8.7:jar", false)))
