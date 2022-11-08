@@ -71,10 +71,11 @@ class GroovyPluginTest {
     project.licenses.add(License.parse("ApacheV2_0", null))
 
     def cache = new CacheProcess(output, null)
-    project.dependencies = new Dependencies(new DependencyGroup("test-compile", false, new Artifact("org.testng:testng:6.8.7:jar", false)))
+    project.dependencies = new Dependencies(new DependencyGroup("test-compile", false, new Artifact("org.testng:testng:6.8.7:jar")))
     project.workflow = new Workflow(
         new FetchWorkflow(output, cache),
-        new PublishWorkflow(cache)
+        new PublishWorkflow(cache),
+        output
     )
 
     GroovyPlugin plugin = new GroovyPlugin(project, new RuntimeConfiguration(), output)
