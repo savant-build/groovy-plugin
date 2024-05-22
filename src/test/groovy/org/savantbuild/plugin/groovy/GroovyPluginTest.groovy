@@ -67,7 +67,7 @@ class GroovyPluginTest {
     Project project = new Project(projectDir.resolve("test-project"), output)
     project.group = "org.savantbuild.test"
     project.name = "test-project"
-    project.version = new Version("1.0")
+    project.version = new Version("1.0.0")
     project.licenses.add(License.parse("ApacheV2_0", null))
 
     def cache = new CacheProcess(output, null, null)
